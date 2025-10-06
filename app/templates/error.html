@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - Yara AI Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(to br, #1E293B, #0F172A);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8 text-center bg-black/20 backdrop-blur-lg rounded-2xl p-8 shadow-lg max-w-md">
+        <i class="fas fa-exclamation-triangle text-red-500 text-6xl mb-6"></i>
+        <h1 class="text-4xl font-bold text-red-400 mb-4">An Error Occurred</h1>
+        <p class="text-xl text-gray-300 mb-6">Something went wrong on our end.</p>
+        {% if error_message %}
+            <p class="text-lg text-red-200 mb-8">Details: {{ error_message }}</p>
+        {% else %}
+            <p class="text-lg text-gray-400 mb-8">Please try again later.</p>
+        {% endif %}
+        <a href="{{ url_for('index') }}" class="bg-yara-blue text-white px-6 py-3 rounded-lg hover:bg-yara-purple transition-colors">
+            Return Home
+        </a>
+    </div>
+</body>
+</html>
+

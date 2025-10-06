@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Yara - AI Voice Assistant{% endblock %}</title>
+
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'yara-blue': '#3B82F6',
+                        'yara-purple': '#8B5CF6',
+                        'yara-dark': '#1E293B',
+                        'yara-light': '#F8FAFC'
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'spin-slow': 'spin 3s linear infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'typing': 'typing 1.5s steps(3) infinite'
+                    },
+                    keyframes: {
+                        glow: {
+                            '0%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)' },
+                            '100%': { boxShadow: '0 0 30px rgba(139, 92, 246, 0.8)' }
+                        },
+                        typing: {
+                            '0%, 20%': { opacity: '0' },
+                            '40%': { opacity: '1' },
+                            '100%': { opacity: '0' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+</head>
+
+<body class="bg-gradient-to-br from-yara-dark to-slate-900 min-h-screen text-white">
+    <!-- Navigation -->
+    <nav class="bg-black/20 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-r from-yara-blue to-yara-purple rounded-full flex items-center justify-center">
+                        <i class="fas fa-microphone text-white"></i>
+                    </div>
+                    <h1
+                        class="text-xl font-bold bg-gradient-to-r from-yara-blue to-yara-purple bg-clip-text text-transparent">
+                        Yara AI Assistant
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('index') }}" class="hover:text-yara-blue transition-colors">Home</a>
+                    <a href="{{ url_for('chat_page') }}" class="hover:text-yara-blue transition-colors">Chat</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black/20 backdrop-blur-lg border-t border-white/10 mt-auto py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm text-gray-400">
+            <p>&copy; 2025 Yara AI Assistant. Powered by advanced AI technology.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script> <!-- Load main.js (YaraAssistant, UIManager) first -->
+    <script src="{{ url_for('static', filename='js/wakeword.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>
+

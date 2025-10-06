@@ -1,0 +1,79 @@
+// {% extends "base.html" %}
+
+{% block title %}Yara - Chat{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 flex flex-col h-[calc(100vh-120px)]">
+    <h2
+        class="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-yara-blue to-yara-purple bg-clip-text text-transparent">
+        Chat with Yara
+    </h2>
+
+    <div class="flex-1 flex flex-col bg-black/20 backdrop-blur-lg rounded-2xl p-6 mb-6 shadow-lg">
+        <!-- Chat Messages Display -->
+        <div id="chat-messages" class="flex-1 overflow-y-auto space-y-4 pb-4">
+            <div class="text-center text-gray-400 py-8" id="no-messages">
+                <i class="fas fa-comment-dots text-4xl mb-4"></i>
+                <p>Start a conversation!</p>
+            </div>
+            <!-- Chat messages will be appended here -->
+        </div>
+
+        <!-- Typing Indicator -->
+        <div id="chat-typing-indicator" class="hidden flex items-center justify-start space-x-2 mt-4">
+            <div
+                class="w-8 h-8 bg-gradient-to-r from-yara-blue to-yara-purple rounded-full flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-robot text-sm text-white"></i>
+            </div>
+            <div class="text-yara-blue">Yara is thinking</div>
+            <div class="flex space-x-1">
+                <div class="w-2 h-2 bg-yara-blue rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                <div class="w-2 h-2 bg-yara-blue rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                <div class="w-2 h-2 bg-yara-blue rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+            </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="flex items-center space-x-4 mt-6">
+            <textarea id="chat-input" placeholder="Type your message..."
+                class="flex-1 px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-yara-blue focus:ring-2 focus:ring-yara-blue/50 focus:outline-none resize-none h-12 overflow-hidden"
+                rows="1"></textarea>
+            <button id="send-message"
+                class="px-5 py-3 bg-gradient-to-r from-yara-blue to-yara-purple rounded-lg text-white font-semibold hover:shadow-lg transition-all duration-300 btn-hover-scale">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+            <button id="voice-input-btn"
+                class="px-5 py-3 bg-gray-700 rounded-lg text-white font-semibold hover:bg-gray-600 transition-all duration-300 btn-hover-scale"
+                title="Voice Input">
+                <i class="fas fa-microphone"></i>
+            </button>
+        </div>
+
+        <!-- Chat Controls -->
+        <div class="flex justify-between items-center mt-4 text-sm text-gray-400">
+            <div class="flex items-center space-x-2">
+                <button id="voice-toggle"
+                    class="px-3 py-1 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors text-white text-xs"
+                    title="Enable/Disable Voice Mode">
+                    <i class="fas fa-volume-up mr-1"></i> Voice Mode
+                </button>
+                <span id="chat-status">Ready to chat</span>
+            </div>
+            <button id="clear-chat"
+                class="px-3 py-1 rounded-full bg-red-600 hover:bg-red-700 transition-colors text-white text-xs"
+                title="Clear Chat History">
+                <i class="fas fa-trash-alt mr-1"></i> Clear Chat
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const CHAT_API_URL = "{{ url_for('chat_bp.chat_api') }}";
+  const CHAT_HISTORY_URL = "{{ url_for('chat_bp.get_chat_history') }}";
+  const VOICE_API_URL = "{{ url_for('voice.process_voice') }}";
+</script>
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+{% endblock %}
