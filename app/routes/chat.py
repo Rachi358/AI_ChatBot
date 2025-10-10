@@ -6,10 +6,7 @@ from app.models.chat_history import ChatHistory
 from app.database import db
 import uuid
 
-# Consistent name
 chat_bp = Blueprint("chat_bp", __name__, url_prefix="/api/chat")
-
-chat_history_mem = []  # avoid clashing with function name
 
 @chat_bp.route("/")
 def chat_page():

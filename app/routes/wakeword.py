@@ -3,7 +3,7 @@ from app.services.wakeword_local import WakeWordDetector
 import numpy as np
 import logging
 
-wakeword_bp = Blueprint('wakeword', __name__, url_prefix='/wakeword')
+wakeword_bp = Blueprint('wakeword', __name__, url_prefix='/api/wakeword')
 
 # Initialize the detector globally
 try:

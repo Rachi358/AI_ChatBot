@@ -106,12 +106,15 @@ AI_VOICE_ASSISTANT_WEB/
 
 ⚙️ Features
 
-- Chat interface (text input) with persistent session-based chat history stored in SQLite.
+- Chat interface (text input) with persistent session-based chat history stored in PostgreSQL (Supabase).
 - Voice processing endpoint that takes text and returns both AI text response and TTS audio (base64).
 - Wake-word detection using Vosk (`WakeWordDetector`) with endpoints to detect wake-word from posted audio slices.
 - Rate-limited and cached calls to Google Gemini for robust AI response handling.
 - TTS using `edge-tts`; voices can be listed and changed via `TTSService`.
-- Error handling with custom templates for 404 and general errors.
+- CORS-enabled API endpoints for frontend integration.
+- Environment variable validation on startup.
+- Comprehensive error handling with custom templates for 404 and general errors.
+- Health check endpoint for monitoring (`/health`).
 
 ---
 
@@ -168,24 +171,35 @@ pip install -r requirements.txt
 
 If you have issues with `pyaudio` on Windows, try installing a prebuilt wheel from: https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyaudio
 
-4. Create a `.env` file in the project root and add required environment variables. Example `.env`:
+4. Create a `.env` file in the project root by copying `.env.example`:
 
-```
-FLASK_DEBUG=true
-SECRET_KEY=your-secret-key
-GOOGLE_API_KEY=sk-...   # Required for Gemini integration
-OPENAI_API_KEY=...      # Optional fallback for TTS
-DATABASE_URL=sqlite:///instance/chat_history.db
+```bash
+cp .env.example .env
 ```
 
-5. Initialize the database (the app auto-creates tables on first run). To ensure instance dir exists:
+Then edit `.env` and add your API keys:
 
-```powershell
-mkdir instance
-python run.py
+```
+# Flask Configuration
+SECRET_KEY=your-secret-key-change-this-in-production
+FLASK_DEBUG=false
+
+# Google AI API Key (Required)
+GOOGLE_API_KEY=your-google-api-key-here
+
+# Supabase Database Configuration
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-supabase-anon-key
+DATABASE_URL=postgresql://postgres.your-project:password@host:6543/postgres
+
+# Optional: OpenAI API Key (fallback for TTS)
+OPENAI_API_KEY=your-openai-api-key-here
 ```
 
-The application will create the SQLite DB files under `instance/` by default.
+Get your Google API key from: https://makersuite.google.com/app/apikey
+Get Supabase credentials from: https://supabase.com/dashboard
+
+5. Database is automatically configured with Supabase. The migration has already been applied to create the `chat_history` table. You can verify the connection using the health check endpoint after starting the app.
 
 6. (Optional) Vosk model: The `WakeWordDetector` will try to download the Vosk model automatically if it is not found in `app/services/vosk-model-small-en-us-0.15` or in the repo root `vosk-model-small-en-us-0.15/`. If automatic download fails, manually download and extract the model into either `vosk-model-small-en-us-0.15/` in the project root or `app/services/vosk-model-small-en-us-0.15/`.
 
@@ -305,15 +319,18 @@ Response:
 
 🗄 Database
 
-The project uses SQLAlchemy with a `ChatHistory` model (`app/models/chat_history.py`) with fields:
+The project uses PostgreSQL (Supabase) with SQLAlchemy ORM. The `ChatHistory` model (`app/models/chat_history.py`) has:
 
-- id: integer primary key
-- session_id: string (UUID per user session)
+- id: UUID primary key (auto-generated)
+- session_id: text (UUID per user session)
 - message: text (message content)
 - is_user: boolean (True for user messages, False for AI responses)
-- timestamp: datetime (UTC by default)
+- timestamp: timestamptz (UTC by default)
+- created_at: timestamptz
 
-Tables are auto-created when the app starts (see `app/__init__.py`).
+The database schema is managed through Supabase migrations. Row Level Security (RLS) is enabled with public access policies (suitable for demo; restrict for production).
+
+Health check endpoint: `GET /health` - Returns database connection status.
 
 ---
 
@@ -333,19 +350,23 @@ Notes & caveats:
 
 🔧 Configuration (.env variables)
 
-Create a `.env` file in the project root and set at least the following:
+Required environment variables (copy from `.env.example`):
 
-- FLASK_DEBUG=true/false
-- SECRET_KEY=your-secret
-- GOOGLE_API_KEY=your-google-generative-ai-key  # Required for Gemini
-- OPENAI_API_KEY=your-openai-key (optional fallback)
-- DATABASE_URL=sqlite:///instance/chat_history.db (or a full DB URL)
+- **SECRET_KEY**: Flask secret key for session management (generate a random string)
+- **FLASK_DEBUG**: Set to `false` in production, `true` for development
+- **GOOGLE_API_KEY**: Google Generative AI API key (required for Gemini)
+- **SUPABASE_URL**: Your Supabase project URL
+- **SUPABASE_ANON_KEY**: Your Supabase anonymous key
+- **DATABASE_URL**: PostgreSQL connection string from Supabase
+- **OPENAI_API_KEY**: OpenAI API key (optional, for TTS fallback)
 
-Optional configuration available in `app/config.py`:
+Optional configuration in `app/config.py`:
 - WAKE_WORD (default: `yara`)
-- WAKE_WORD_SENSITIVITY (float 0.1-1.0)
+- WAKE_WORD_SENSITIVITY (float 0.1-1.0, default: 0.6)
 - TTS_SERVICE (default: `edge-tts`)
 - STT_SERVICE (default: `web-speech-api`)
+
+The application validates all required environment variables on startup and will log warnings for missing or placeholder values.
 
 ---
 
